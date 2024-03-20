@@ -23,6 +23,7 @@ const { createClient } = require('redis');
     // console.log('tickersData', tickersData)
     for (let symbol in tickersData) {
       let price = tickersData[symbol].info.lastPrice
+      let priceChangePercent24h = tickersData[symbol].info.price24hPcnt * 100
       
       if (symbol === 'USDT/EUR') {
         price = (1 / price).toFixed (4)
@@ -34,7 +35,8 @@ const { createClient } = require('redis');
       client.hSet(key,{
         Price: price,
         CreatedAt: timestamp,
-        ExpireAt: expiryTimestamp
+        ExpireAt: expiryTimestamp,
+        priceChangePercent24h: priceChangePercent24h
       })
 
       // publish to redis on price change topic
