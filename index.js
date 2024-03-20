@@ -27,6 +27,7 @@ const { createClient } = require('redis');
       
       if (symbol === 'USDT/EUR') {
         price = (1 / price).toFixed (4)
+        priceChangePercent24h = priceChangePercent24h * -1
         symbol = 'EUR/USDT'
       }
 
