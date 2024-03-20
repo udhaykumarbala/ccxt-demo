@@ -36,7 +36,7 @@ const { createClient } = require('redis');
         Price: price,
         CreatedAt: timestamp,
         ExpireAt: expiryTimestamp,
-        priceChangePercent24h: priceChangePercent24h
+        PriceChangePercent24h: priceChangePercent24h
       })
 
       // publish to redis on price change topic
