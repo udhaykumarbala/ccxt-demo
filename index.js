@@ -14,7 +14,11 @@ const { createClient } = require('redis');
 
   const exchange = new ccxt.bybit({ enableRateLimit: true })
   while (true) {
-    const tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'MATIC/USDT','LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT'])
+    let tickers = {}
+    tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'MATIC/USDT','LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
+      let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+      console.log(timeNowIndia,'Error in watchTickers', e)
+    })
     // const tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT'])
     const stableCoins = {}
     const timestamp = new Date().getTime()
@@ -33,6 +37,7 @@ const { createClient } = require('redis');
 
       symbol =  symbol.replace ('/', ':')
       const key = redisBaseKey + symbol
+
       client.hSet(key,{
         Price: price,
         CreatedAt: timestamp,
@@ -42,8 +47,8 @@ const { createClient } = require('redis');
 
       // publish to redis on price change topic
       
-      
-      // console.log (timestamp, expiryTimestamp, symbol, price)
+      timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+      console.log (timeNowIndia, expiryTimestamp, symbol, price)
       client.publish('price-change', 'price changed')
     }
 
