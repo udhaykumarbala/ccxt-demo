@@ -15,8 +15,8 @@ const { createClient } = require('redis');
   const exchange = new ccxt.bybit({ enableRateLimit: true })
   while (true) {
     let tickers = {}
-    // tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
-    tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'MATIC/USDT','LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
+    tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
+    // tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'MATIC/USDT','LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
       let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
       console.log(timeNowIndia,'Error in watchTickers', e)
     })
