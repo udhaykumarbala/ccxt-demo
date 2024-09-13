@@ -52,15 +52,15 @@ const { createClient } = require('redis');
     }
 
     // get MATIC/USDT price from binance
-    const binance = new ccxt.binance({ enableRateLimit: true })
-    const maticPrice = await binance.fetchTicker('MATIC/USDT').catch((e) => {
-      let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
-      console.log(timeNowIndia,'Error in fetchTicker', e)
-    })
+    // const binance = new ccxt.binance({ enableRateLimit: true })
+    // const maticPrice = await binance.fetchTicker('MATIC/USDT').catch((e) => {
+    //   let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+    //   console.log(timeNowIndia,'Error in fetchTicker', e)
+    // })
 
     const maticPriceKey = redisBaseKey + 'MATIC:USDT'
-    const price = maticPrice.last
-    const priceChangePercent24h = maticPrice.info.priceChangePercent
+    const price = 0.3794
+    const priceChangePercent24h = 0
     client.hSet(maticPriceKey,{
       Price: price,
       CreatedAt: timestamp,
