@@ -15,8 +15,8 @@ const { createClient } = require('redis');
   const exchange = new ccxt.bybit({ enableRateLimit: true })
   while (true) {
     let tickers = {}
-    tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
-    // tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'MATIC/USDT','LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
+    // tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
+    tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
       let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
       console.log(timeNowIndia,'Error in watchTickers', e)
     })
@@ -48,11 +48,32 @@ const { createClient } = require('redis');
       // publish to redis on price change topic
       
       timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
-      console.log (timeNowIndia, expiryTimestamp, symbol, price)
-      client.publish('price-change', 'price changed')
+      // console.log (timeNowIndia, expiryTimestamp, symbol, price)
     }
 
+    // get MATIC/USDT price from binance
+    const binance = new ccxt.binance({ enableRateLimit: true })
+    const maticPrice = await binance.fetchTicker('MATIC/USDT').catch((e) => {
+      let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+      console.log(timeNowIndia,'Error in fetchTicker', e)
+    })
 
+    const maticPriceKey = redisBaseKey + 'MATIC:USDT'
+    const price = maticPrice.last
+    const priceChangePercent24h = maticPrice.info.priceChangePercent
+    client.hSet(maticPriceKey,{
+      Price: price,
+      CreatedAt: timestamp,
+      ExpireAt: expiryTimestamp,
+      PriceChangePercent24h: priceChangePercent24h
+    })
+
+    timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+
+    // console.log ("binance", timeNowIndia, expiryTimestamp, 'MATIC:USDT', price)
+
+    client.publish('price-change', 'price changed')
+    
   }
 
 }) ()
