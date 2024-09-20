@@ -15,8 +15,9 @@ const { createClient } = require('redis');
   const exchange = new ccxt.bybit({ enableRateLimit: true })
   while (true) {
     let tickers = {}
+    let allAssets = [ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT'];
     // tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
-    tickers = await exchange.watchTickers([ 'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'DOGE/USDT', 'LTC/USDT', 'LINK/USDT','TRX/USDT','RUNE/USDT','AAVE/USDT']).catch((e) => {
+    tickers = await exchange.watchTickers(allAssets).catch((e) => {
       let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
       console.log(timeNowIndia,'Error in watchTickers', e)
     })
@@ -52,11 +53,30 @@ const { createClient } = require('redis');
     }
 
     // get MATIC/USDT price from binance
-    // const binance = new ccxt.binance({ enableRateLimit: true })
-    // const maticPrice = await binance.fetchTicker('MATIC/USDT').catch((e) => {
-    //   let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
-    //   console.log(timeNowIndia,'Error in fetchTicker', e)
-    // })
+    const binance = new ccxt.binance({ enableRateLimit: true })
+    const maticPrice = await binance.fetchTicker('MATIC/USDT').catch((e) => {
+      let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+      console.log(timeNowIndia,'Error in fetchTicker', e)
+    })
+
+    // filter not price fetched assets from allAssets
+    allAssets = allAssets.filter(asset => asset !== 'MATIC/USDT')
+
+    const maticPriceKey = redisBaseKey + 'MATIC:USDT'
+    const price = maticPrice.last
+    const priceChangePercent24h = maticPrice.percentage
+    client.hSet(maticPriceKey,{
+      Price: price,
+      CreatedAt: timestamp,
+      ExpireAt: expiryTimestamp,
+      PriceChangePercent24h: priceChangePercent24h
+    })
+
+
+
+
+
+
 
     const maticPriceKey = redisBaseKey + 'MATIC:USDT'
     const price = 0.3794
