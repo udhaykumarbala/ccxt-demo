@@ -18,6 +18,7 @@ const { createClient } = require('redis');
   while (true) {
     let tickers = {}
     // tickers = await exchange.watchTickers(['USDT/EUR', 'PAXG/USDT']).catch((e) => {
+    if (allAssets.length !== 0) {
     tickers = await exchange.watchTickers(allAssets).catch((e) => {
       // add error causing asset to secondaryCheckAssets
       asset = e.message.split(' ').pop()
@@ -26,6 +27,7 @@ const { createClient } = require('redis');
       let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
       console.log(timeNowIndia,'Error in watchTickers', e)
     })
+  }
     const stableCoins = {}
     const timestamp = new Date().getTime()
     const expiryTimestamp = timestamp + 15 // 15 seconds
@@ -61,7 +63,7 @@ const { createClient } = require('redis');
     if (secondaryCheckAssets.length > 0) {
       // get price from binance
       const binance = new ccxt.binance({ enableRateLimit: true })
-      const secondaryCheckAssetsPrice = await binance.fetchTicker(secondaryCheckAssets).catch((e) => {
+      const secondaryCheckAssetsPrice = await binance.watchTickers(secondaryCheckAssets).catch((e) => {
       
       let timeNowIndia = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
       console.log(timeNowIndia,'Error in fetchTicker', e)
